@@ -180,6 +180,13 @@ circumstances but should work for most people:
   '~/vimfiles/misc/notes/user' on Windows and '~/.vim/misc/notes/user' on
   other platforms.
 
+- The notes can be further stored in a subfolder of the notes_directories.
+  For example, a note titled "Meetings/2016/01/Smith's Big Account" will be
+  stored in a file named "Smith's Big Account" in the 
+  ~/vimfiles/misc/notes/user/Meetings/2016/01 folder
+  However vim-notes will not automatically create the folder hierarchy
+  (look at a plugin like auto_mkdir for that functionality)
+
 -------------------------------------------------------------------------------
                                                 *notes-backwards-compatibility*
 Backwards compatibility ~

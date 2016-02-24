@@ -909,26 +909,54 @@ function! xolox#notes#fname_to_title(filename) " {{{3
   if fname[-len(g:notes_suffix):] == g:notes_suffix
     let fname = fname[0:-len(g:notes_suffix)-1]
   endif
-  " Strip directory path.
-  let fname = fnamemodify(fname, ':t')
+
+  " NG
+  " find note's subfolder and prepend it to the title
+  let notes_directories = xolox#notes#find_directories(0)
+  let found = 0
+  for directory in notes_directories
+    if xolox#misc#path#starts_with(a:filename, directory)
+      let fname = substitute(a:filename, directory . '/', '', '')
+      let found = 1
+    endif
+  endfor
+  if !found
+    " Strip directory path.
+    let fname = fnamemodify(fname, ':t')
+  end
+
   " Decode special characters.
   return xolox#misc#path#decode(fname)
 endfunction
 
 function! xolox#notes#title_to_fname(title) " {{{3
   " Convert note {title} to absolute filename.
-  let filename = xolox#misc#path#encode(a:title)
+
+  " NG
+  " Do not encode the whole title, break it into components and
+  " encode them separately, so that we can store the note in its
+  " own folder
+  let components = xolox#misc#path#split(a:title)
+  let components = map(components, 'xolox#misc#path#encode(v:val)')
+  let filename = xolox#misc#path#join(components)
+
   if filename != ''
-    let directory = xolox#notes#select_directory()
+    let directory = xolox#notes#select_directory(filename)
     let pathname = xolox#misc#path#merge(directory, filename . g:notes_suffix)
     return xolox#misc#path#absolute(pathname)
   endif
   return ''
 endfunction
 
-function! xolox#notes#select_directory() " {{{3
+function! xolox#notes#select_directory(filename) " {{{3
   " Pick the best suited directory for creating a new note.
   let buffer_directory = expand('%:p:h')
+  " NG 
+  " Remove current directory since it is already part of the note's
+  " title
+  let file_directory = fnamemodify(a:filename, ':h')
+  let buffer_directory = substitute(buffer_directory, file_directory . '$', '', '')
+
   let notes_directories = xolox#notes#find_directories(0)
   for directory in notes_directories
     if xolox#misc#path#starts_with(buffer_directory, directory)
