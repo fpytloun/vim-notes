@@ -951,18 +951,23 @@ endfunction
 function! xolox#notes#select_directory(filename) " {{{3
   " Pick the best suited directory for creating a new note.
   let buffer_directory = expand('%:p:h')
-  " NG 
-  " Remove current directory since it is already part of the note's
-  " title
-  let file_directory = fnamemodify(a:filename, ':h')
-  let buffer_directory = substitute(buffer_directory, file_directory . '$', '', '')
 
   let notes_directories = xolox#notes#find_directories(0)
+
+  let file_directory = fnamemodify(a:filename, ':h')
   for directory in notes_directories
     if xolox#misc#path#starts_with(buffer_directory, directory)
-      return buffer_directory
+      " NG 
+      " If the filename parameters already has a directory, we want to use 
+      " that instead of looking at the buffer's directory
+      if file_directory != '.'
+        return directory
+      else
+        return buffer_directory
+      endif
     endif
   endfor
+
   return notes_directories[0]
 endfunction
 
