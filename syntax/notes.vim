@@ -56,6 +56,12 @@ endif
 highlight def link notesSingleQuoted Special
 highlight def link notesDoubleQuoted String
 
+" Render URL links
+syntax region urlTitle matchgroup=mkdDelimiter start="\[" end="\]" oneline concealends nextgroup=urlRef
+syntax region urlRef matchgroup=mkdDelimiter start="(" end=")" oneline conceal contained
+highlight link urlTitle notesRealURL
+highlight link urlRef notesRealURL
+
 " Highlight inline code fragments (same as Markdown syntax). {{{2
 if has('conceal') && xolox#misc#option#get('notes_conceal_code', 1)
   syntax region notesInlineCode matchgroup=notesInlineCodeMarker start=/`/ end=/`/ concealends
